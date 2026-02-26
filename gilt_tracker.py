@@ -21,7 +21,8 @@ BOE_API_URL = "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowco
 OUTPUT_DIR = Path(__file__).parent
 DASHBOARD_FILE = OUTPUT_DIR / "index.html"
 DATA_FILE = OUTPUT_DIR / "gilt_data.json"
-LOGO_FILE = OUTPUT_DIR.parent / "Branding" / "Fairhurst-Buckley-logo-COLOUR.jpg"
+LOGO_FILE = OUTPUT_DIR / "logo.jpg"
+LOGO_FILE_FALLBACK = OUTPUT_DIR.parent / "Branding" / "Fairhurst-Buckley-logo-COLOUR.jpg"
 
 # CNBC quote API for live benchmark 30-year gilt bond yield (matches FT figure)
 CNBC_API_URL = (
@@ -189,17 +190,18 @@ def save_data(data_points, stats):
 
 def load_logo_base64():
     """Load the Fairhurst Buckley logo and return as a base64 data URI."""
-    try:
-        with open(LOGO_FILE, "rb") as f:
-            data = f.read()
-        if len(data) < 1000:
-            print(f"Warning: Logo file too small ({len(data)} bytes), skipping")
-            return ""
-        b64 = base64.b64encode(data).decode("utf-8")
-        return f"data:image/jpeg;base64,{b64}"
-    except FileNotFoundError:
-        print(f"Warning: Logo not found at {LOGO_FILE}")
-        return ""
+    for path in [LOGO_FILE, LOGO_FILE_FALLBACK]:
+        try:
+            with open(path, "rb") as f:
+                data = f.read()
+            if len(data) < 1000:
+                continue
+            b64 = base64.b64encode(data).decode("utf-8")
+            return f"data:image/jpeg;base64,{b64}"
+        except FileNotFoundError:
+            continue
+    print("Warning: No valid logo file found")
+    return ""
 
 
 def fetch_live_gilt_yield():
