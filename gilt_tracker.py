@@ -191,7 +191,11 @@ def load_logo_base64():
     """Load the Fairhurst Buckley logo and return as a base64 data URI."""
     try:
         with open(LOGO_FILE, "rb") as f:
-            b64 = base64.b64encode(f.read()).decode("utf-8")
+            data = f.read()
+        if len(data) < 1000:
+            print(f"Warning: Logo file too small ({len(data)} bytes), skipping")
+            return ""
+        b64 = base64.b64encode(data).decode("utf-8")
         return f"data:image/jpeg;base64,{b64}"
     except FileNotFoundError:
         print(f"Warning: Logo not found at {LOGO_FILE}")
