@@ -1131,32 +1131,40 @@ def generate_dashboard(data_points, stats, live_data=None):
 
         @media (max-width: 768px) {{
             .header {{
-                padding: 16px 16px;
-                gap: 12px;
+                padding: 12px 16px;
+                position: relative;
+                min-height: 60px;
             }}
 
             .header-left {{
-                gap: 12px;
+                gap: 10px;
+                max-width: 65%;
             }}
 
             .header-title h1 {{
-                font-size: 17px;
+                font-size: 16px;
             }}
 
             .header-title p {{
-                font-size: 11px;
+                font-size: 10px;
             }}
 
             .header-right {{
-                gap: 12px;
+                position: absolute;
+                top: 12px;
+                right: 16px;
+                flex-direction: column;
+                align-items: flex-end;
+                gap: 6px;
             }}
 
             .header-meta {{
-                font-size: 11px;
+                font-size: 10px;
+                line-height: 1.3;
             }}
 
             .header-logo img {{
-                height: 32px;
+                height: 28px;
             }}
 
             .yield-hero {{
@@ -1179,7 +1187,12 @@ def generate_dashboard(data_points, stats, live_data=None):
 
             .summary-callout {{
                 padding: 12px 16px;
-                font-size: 13px;
+                font-size: 12px;
+                line-height: 1.6;
+            }}
+
+            .summary-callout .sc-icon {{
+                display: none;
             }}
 
             .container {{
