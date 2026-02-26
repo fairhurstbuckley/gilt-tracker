@@ -630,6 +630,35 @@ def generate_dashboard(data_points, stats, live_data=None):
             gap: 12px;
         }}
 
+        .timeframe-btns {{
+            display: flex;
+            gap: 6px;
+        }}
+
+        .tf-btn {{
+            padding: 5px 14px;
+            border-radius: 6px;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }}
+
+        .tf-btn:hover {{
+            border-color: #7ebc3b;
+            color: #7ebc3b;
+        }}
+
+        .tf-btn.active {{
+            background: #7ebc3b;
+            color: #fff;
+            border-color: #7ebc3b;
+        }}
+
         .chart-title {{
             font-size: 16px;
             font-weight: 700;
@@ -1147,8 +1176,14 @@ def generate_dashboard(data_points, stats, live_data=None):
         <div class="chart-container">
             <div class="chart-header">
                 <div>
-                    <div class="chart-title">Yield History &mdash; Last Twelve Months</div>
+                    <div class="chart-title" id="yieldChartTitle">Yield History &mdash; Last Twelve Months</div>
                     <div class="chart-subtitle">{'Adjusted to benchmark level (+' + f'{spread:.2f}' + '% spread applied to BoE yield curve)' if spread_ok else 'Daily nominal zero coupon 30-year gilt yield (%)'}</div>
+                </div>
+                <div class="timeframe-btns">
+                    <button class="tf-btn" data-months="1">1M</button>
+                    <button class="tf-btn" data-months="3">3M</button>
+                    <button class="tf-btn" data-months="6">6M</button>
+                    <button class="tf-btn active" data-months="12">1Y</button>
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -1427,6 +1462,29 @@ def generate_dashboard(data_points, stats, live_data=None):
                 (falling ? 'below' : 'above') + ' the 30-day moving average. ' +
                 '<em>' + commentary + '.</em></span>';
         }})();
+
+        // Time frame selector
+        document.querySelectorAll('.tf-btn').forEach(function(btn) {{
+            btn.addEventListener('click', function() {{
+                document.querySelectorAll('.tf-btn').forEach(function(b) {{ b.classList.remove('active'); }});
+                this.classList.add('active');
+                const months = parseInt(this.dataset.months);
+                const cutoff = new Date();
+                cutoff.setMonth(cutoff.getMonth() - months);
+                const minDate = cutoff.toISOString().split('T')[0];
+
+                yieldChart.options.scales.x.min = minDate;
+                yieldChart.update();
+
+                if (typeof valueChartInstance !== 'undefined' && valueChartInstance) {{
+                    valueChartInstance.options.scales.x.min = minDate;
+                    valueChartInstance.update();
+                }}
+
+                const titles = {{1:'Last Month', 3:'Last 3 Months', 6:'Last 6 Months', 12:'Last Twelve Months'}};
+                document.getElementById('yieldChartTitle').textContent = 'Yield History \u2014 ' + titles[months];
+            }});
+        }});
     </script>
 
     <script>
