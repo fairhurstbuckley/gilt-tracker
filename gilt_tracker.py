@@ -354,7 +354,6 @@ def generate_dashboard(data_points, stats, live_data=None):
     month_change = stats.get("month_change", 0)
     month_bps = abs(month_change) * 100
     month_ago_yield = current_yield - month_change
-    month_ago_borrowing = month_ago_yield + PROPERTY_LENDING_SPREAD_BPS / 100
     borrowing_verb = "reducing" if month_change < 0 else "increasing"
 
     # Data freshness info
@@ -391,18 +390,6 @@ def generate_dashboard(data_points, stats, live_data=None):
     else:
         header_subtitle = f"Nominal Zero Coupon &middot; Series {SERIES_CODE} &middot; Bank of England"
 
-    # Build sensitivity rows: -50bps to +50bps in 25bp steps
-    sensitivity_rows = ""
-    for delta_bps in [-50, -25, 0, 25, 50]:
-        scenario_gilt = current_yield + delta_bps / 100
-        scenario_borrowing = scenario_gilt + PROPERTY_LENDING_SPREAD_BPS / 100
-        highlight = ' class="sensitivity-current"' if delta_bps == 0 else ""
-        label = "Current" if delta_bps == 0 else f"{delta_bps:+d}bps"
-        sensitivity_rows += f"""<tr{highlight}>
-            <td>{label}</td>
-            <td>{scenario_gilt:.2f}%</td>
-            <td>{scenario_borrowing:.2f}%</td>
-        </tr>\n"""
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -766,61 +753,6 @@ def generate_dashboard(data_points, stats, live_data=None):
             line-height: 1.6;
         }}
 
-        /* ── Sensitivity Table ── */
-        .sensitivity-table {{
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 12px;
-            font-size: 13px;
-        }}
-
-        .sensitivity-table th {{
-            text-align: left;
-            color: #6b7280;
-            font-weight: 700;
-            padding: 8px 12px;
-            border-bottom: 2px solid #e5e7eb;
-            font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }}
-
-        .sensitivity-table td {{
-            padding: 8px 12px;
-            color: #4b5563;
-            border-bottom: 1px solid #f3f4f6;
-        }}
-
-        .sensitivity-current td {{
-            color: #32373c;
-            font-weight: 700;
-            background: #f0f9eb;
-        }}
-
-        /* ── Borrowing Callout ── */
-        .borrowing-callout {{
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: #f0f9eb;
-            border: 1px solid #c8e6a5;
-            border-radius: 10px;
-            padding: 18px 22px;
-            margin-top: 14px;
-        }}
-
-        .borrowing-callout .bc-value {{
-            font-size: 32px;
-            font-weight: 700;
-            color: #7ebc3b;
-            white-space: nowrap;
-        }}
-
-        .borrowing-callout .bc-label {{
-            font-size: 13px;
-            color: #4b5563;
-            line-height: 1.5;
-        }}
 
         /* ── Property Calculator ── */
         .calculator {{
@@ -1154,9 +1086,7 @@ def generate_dashboard(data_points, stats, live_data=None):
                 Last updated: {updated_time}<br>
                 {data_freshness}
             </div>
-            <div class="header-logo">
-                <img src="{logo_data_uri}" alt="Fairhurst Buckley">
-            </div>
+            {'<div class="header-logo"><img src="' + logo_data_uri + '" alt="Fairhurst Buckley"></div>' if logo_data_uri else ''}
         </div>
     </div>
 
@@ -1187,8 +1117,7 @@ def generate_dashboard(data_points, stats, live_data=None):
     <div class="summary-callout">
         <span class="sc-icon">&#9432;</span>
         Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.2f}%</strong> ({month_bps:.0f}bps),
-        {borrowing_verb} the implied cost of long-term property debt from
-        <span class="sc-highlight">{month_ago_borrowing:.2f}%</span> to <span class="sc-highlight">{implied_borrowing:.2f}%</span>.
+        {borrowing_verb} the implied cost of long-term property debt.
     </div>
 
     <div class="container">
@@ -1300,33 +1229,6 @@ def generate_dashboard(data_points, stats, live_data=None):
             </div>
         </div>
 
-        <div class="context-grid" style="grid-template-columns: 1fr;">
-            <div class="context-card">
-                <h3>Financing Cost Sensitivity</h3>
-                <div class="context-body">
-                    <p>Indicative all-in borrowing cost assuming a <strong>{PROPERTY_LENDING_SPREAD_BPS}bps</strong> margin
-                    over the 30-year gilt (typical for investment-grade UK commercial property).</p>
-                    <div class="borrowing-callout">
-                        <div class="bc-value">{implied_borrowing:.2f}%</div>
-                        <div class="bc-label">
-                            Current implied all-in cost of<br>long-term secured property debt
-                        </div>
-                    </div>
-                    <table class="sensitivity-table">
-                        <thead>
-                            <tr>
-                                <th>Scenario</th>
-                                <th>Gilt Yield</th>
-                                <th>All-in Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {sensitivity_rows}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
 
         <div class="data-note">
             <h4>About this data</h4>
