@@ -1,0 +1,57 @@
+name: Update Gilt Dashboard
+
+on:
+  schedule:
+    # Run at 07:00 and 17:00 UTC Mon-Fri (UK market hours)
+    - cron: '0 7 * * 1-5'
+    - cron: '0 17 * * 1-5'
+  workflow_dispatch: # Allow manual trigger from GitHub
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Create logo placeholder
+        run: |
+          # The logo is referenced relative to the parent directory.
+          # Create a placeholder so the script doesn't error on CI.
+          mkdir -p "../Branding"
+          python -c "
+          import base64, pathlib
+          # Tiny 1x1 transparent JPEG
+          b = base64.b64decode('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAgGBgcGBQgHBwcJCQgKDBQNDAsLDBkSEw8UHRofHh0aHBwgJC4nICIsIxwcKDcpLDAxNDQ0Hyc5PTgyPC4zNDL/2wBDAQkJCQwLDBgNDRgyIRwhMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjL/wAARCAABAAEDASIAAhEBAxEB/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/xAAUAQEAAAAAAAAAAAAAAAAAAAAA/8QAFBEBAAAAAAAAAAAAAAAAAAAAAP/aAAwDAQACEQMRAD8AKwA//9k=')
+          pathlib.Path('../Branding/Fairhurst-Buckley-logo-COLOUR.jpg').write_bytes(b)
+          "
+
+      - name: Generate dashboard
+        run: python gilt_tracker.py
+
+      - name: Prepare pages content
+        run: |
+          mkdir -p _site
+          cp gilt_dashboard.html _site/index.html
+
+      - name: Deploy to gh-pages branch
+        run: |
+          cd _site
+          git init
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add index.html
+          git commit -m "Update gilt dashboard — $(date -u +'%d %b %Y %H:%M UTC')"
+          git branch -M gh-pages
+          git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+          git push -f origin gh-pages

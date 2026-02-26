@@ -1,0 +1,4 @@
+__pycache__/
+*.pyc
+gilt_data.json
+setup_daily_update.bat
