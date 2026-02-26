@@ -1486,7 +1486,7 @@ def generate_dashboard(data_points, stats, live_data=None):
     </div>
 
     <div class="footer">
-        Live yield: CNBC / Reuters &middot; Historical chart: <a href="https://www.bankofengland.co.uk/statistics/yield-curves" target="_blank">Bank of England</a>
+        Live yield: <a href="https://www.cnbc.com/quotes/GB30Y-GB" target="_blank">CNBC / Reuters</a> &middot; Historical chart: <a href="https://www.bankofengland.co.uk/statistics/yield-curves" target="_blank">Bank of England</a>
         &middot; Prepared for Fairhurst Buckley
     </div>
 
