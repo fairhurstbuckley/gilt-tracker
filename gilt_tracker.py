@@ -1131,36 +1131,37 @@ def generate_dashboard(data_points, stats, live_data=None):
 
         @media (max-width: 768px) {{
             .header {{
-                padding: 12px 16px;
-                position: relative;
-                min-height: 60px;
+                padding: 10px 16px;
+                flex-wrap: nowrap;
             }}
 
             .header-left {{
                 gap: 10px;
-                max-width: 65%;
+                flex: 1;
+                min-width: 0;
             }}
 
             .header-title h1 {{
-                font-size: 16px;
+                font-size: 14px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
             }}
 
             .header-title p {{
                 font-size: 10px;
+                display: none;
             }}
 
             .header-right {{
-                position: absolute;
-                top: 12px;
-                right: 16px;
-                flex-direction: column;
-                align-items: flex-end;
-                gap: 6px;
+                flex-direction: row-reverse;
+                align-items: center;
+                gap: 10px;
+                flex-shrink: 0;
             }}
 
             .header-meta {{
-                font-size: 10px;
-                line-height: 1.3;
+                display: none;
             }}
 
             .header-logo img {{
@@ -1334,8 +1335,7 @@ def generate_dashboard(data_points, stats, live_data=None):
 
     <div class="summary-callout">
         <span class="sc-icon">&#9432;</span>
-        Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.2f}%</strong> ({month_bps:.0f}bps),
-        {borrowing_verb} the implied cost of long-term property debt.
+        <span>Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.2f}%</strong> ({month_bps:.0f}bps), {borrowing_verb} the implied cost of long-term property debt.</span>
     </div>
 
     <div class="container">
