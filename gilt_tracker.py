@@ -877,6 +877,50 @@ def generate_dashboard(data_points, stats, live_data=None):
             padding-right: 32px;
         }}
 
+        .calc-toggle-row {{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }}
+
+        .calc-toggle-row label {{
+            margin-bottom: 0;
+        }}
+
+        .calc-toggle {{
+            display: flex;
+            gap: 2px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            padding: 2px;
+        }}
+
+        .ct-btn {{
+            padding: 3px 10px;
+            border: none;
+            border-radius: 5px;
+            background: transparent;
+            color: #6b7280;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.15s;
+        }}
+
+        .ct-btn.active {{
+            background: #7ebc3b;
+            color: #fff;
+        }}
+
+        .calc-derived {{
+            font-size: 12px;
+            color: #7ebc3b;
+            font-weight: 600;
+            margin-top: 6px;
+        }}
+
         .calc-slider {{
             margin-top: 4px;
         }}
@@ -1218,11 +1262,22 @@ def generate_dashboard(data_points, stats, live_data=None):
                         </div>
                     </div>
                     <div class="calc-field">
-                        <label>Current Property Yield (Cap Rate)</label>
-                        <div class="input-wrap">
+                        <div class="calc-toggle-row">
+                            <label id="yieldFieldLabel">Property Yield</label>
+                            <div class="calc-toggle">
+                                <button class="ct-btn active" id="modeYield" data-mode="yield">Yield</button>
+                                <button class="ct-btn" id="modePrice" data-mode="price">Guide Price</button>
+                            </div>
+                        </div>
+                        <div class="input-wrap" id="yieldWrap">
                             <input type="text" id="calcYield" class="has-suffix" placeholder="e.g. 5.50" inputmode="decimal">
                             <span class="suffix">%</span>
                         </div>
+                        <div class="input-wrap" id="priceWrap" style="display:none;">
+                            <span class="prefix">&pound;</span>
+                            <input type="text" id="calcPrice" class="has-prefix" placeholder="e.g. 4,500,000" inputmode="numeric">
+                        </div>
+                        <div class="calc-derived" id="calcDerived" style="display:none;"></div>
                     </div>
                     <div class="calc-slider">
                         <label>Gilt Pass-Through Rate</label>
@@ -1284,7 +1339,7 @@ def generate_dashboard(data_points, stats, live_data=None):
 
     <div class="footer">
         Live yield: CNBC / Reuters &middot; Historical chart: <a href="https://www.bankofengland.co.uk/statistics/yield-curves" target="_blank">Bank of England</a>
-        &middot; Prepared by Fairhurst Buckley
+        &middot; Prepared for Fairhurst Buckley
     </div>
 
     <script>
@@ -1492,6 +1547,7 @@ def generate_dashboard(data_points, stats, live_data=None):
         const CURRENT_GILT = {current_yield};
         const rentInput = document.getElementById('calcRent');
         const yieldInput = document.getElementById('calcYield');
+        const priceInput = document.getElementById('calcPrice');
         const passThroughInput = document.getElementById('calcPassThrough');
         const passPctEl = document.getElementById('calcPassPct');
         const passDescEl = document.getElementById('calcPassDesc');
@@ -1499,6 +1555,13 @@ def generate_dashboard(data_points, stats, live_data=None):
         const content = document.getElementById('calcContent');
         const baseValEl = document.getElementById('calcBaseVal');
         const tableBody = document.getElementById('calcTableBody');
+        const yieldWrap = document.getElementById('yieldWrap');
+        const priceWrap = document.getElementById('priceWrap');
+        const calcDerived = document.getElementById('calcDerived');
+        const modeYieldBtn = document.getElementById('modeYield');
+        const modePriceBtn = document.getElementById('modePrice');
+        const yieldFieldLabel = document.getElementById('yieldFieldLabel');
+        let inputMode = 'yield';
 
         function parseNumber(str) {{
             return parseFloat(str.replace(/[^0-9.]/g, ''));
@@ -1725,8 +1788,25 @@ def generate_dashboard(data_points, stats, live_data=None):
             updateSliderLabel();
 
             const rent = parseNumber(rentInput.value);
-            const propYield = parseNumber(yieldInput.value);
             const passThrough = parseInt(passThroughInput.value) / 100;
+
+            let propYield;
+            if (inputMode === 'price') {{
+                const price = parseNumber(priceInput.value);
+                if (!rent || !price || rent <= 0 || price <= 0) {{
+                    placeholder.style.display = 'flex';
+                    content.classList.remove('visible');
+                    calcDerived.style.display = 'none';
+                    updateValueChart(0, 0, 0);
+                    return;
+                }}
+                propYield = (rent / price) * 100;
+                calcDerived.textContent = 'Implied yield: ' + propYield.toFixed(2) + '%';
+                calcDerived.style.display = 'block';
+            }} else {{
+                propYield = parseNumber(yieldInput.value);
+                calcDerived.style.display = 'none';
+            }}
 
             if (!rent || !propYield || rent <= 0 || propYield <= 0) {{
                 placeholder.style.display = 'flex';
@@ -1793,6 +1873,34 @@ def generate_dashboard(data_points, stats, live_data=None):
 
         yieldInput.addEventListener('input', recalculate);
         passThroughInput.addEventListener('input', recalculate);
+
+        priceInput.addEventListener('input', function() {{
+            const raw = this.value.replace(/[^0-9]/g, '');
+            if (raw) {{
+                this.value = parseInt(raw).toLocaleString('en-GB');
+            }}
+            recalculate();
+        }});
+
+        modeYieldBtn.addEventListener('click', function() {{
+            inputMode = 'yield';
+            modeYieldBtn.classList.add('active');
+            modePriceBtn.classList.remove('active');
+            yieldWrap.style.display = '';
+            priceWrap.style.display = 'none';
+            yieldFieldLabel.textContent = 'Property Yield';
+            recalculate();
+        }});
+
+        modePriceBtn.addEventListener('click', function() {{
+            inputMode = 'price';
+            modePriceBtn.classList.add('active');
+            modeYieldBtn.classList.remove('active');
+            yieldWrap.style.display = 'none';
+            priceWrap.style.display = '';
+            yieldFieldLabel.textContent = 'Guide Price';
+            recalculate();
+        }});
     </script>
 </body>
 </html>"""
