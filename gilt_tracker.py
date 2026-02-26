@@ -571,36 +571,6 @@ def generate_dashboard(data_points, stats, live_data=None):
             color: #7ebc3b;
         }}
 
-        /* ── Value Hero ── */
-        .value-hero {{
-            background: #fffbf0;
-            border-bottom: 1px solid #f0e4c8;
-            padding: 24px 40px;
-            text-align: center;
-        }}
-
-        .vh-label {{
-            font-size: 11px;
-            font-weight: 700;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 4px;
-        }}
-
-        .vh-value {{
-            font-size: 44px;
-            font-weight: 700;
-            color: #d4a039;
-            letter-spacing: -1px;
-            line-height: 1.1;
-        }}
-
-        .vh-sub {{
-            font-size: 12px;
-            color: #9ca3af;
-            margin-top: 4px;
-        }}
 
         /* ── Container ── */
         .container {{
@@ -1236,13 +1206,6 @@ def generate_dashboard(data_points, stats, live_data=None):
                 display: none;
             }}
 
-            .value-hero {{
-                padding: 18px 16px;
-            }}
-
-            .vh-value {{
-                font-size: 34px;
-            }}
 
             .container {{
                 padding: 20px 16px;
@@ -1386,11 +1349,6 @@ def generate_dashboard(data_points, stats, live_data=None):
         <span>Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.3f}%</strong> ({month_bps:.0f}bps), {borrowing_verb} the implied cost of long-term property debt.</span>
     </div>
 
-    <div class="value-hero" id="valueHero" style="display:none;">
-        <div class="vh-label">Implied Disposal Value</div>
-        <div class="vh-value" id="vhValue"></div>
-        <div class="vh-sub" id="vhSub"></div>
-    </div>
 
     <div class="container">
         <div class="stats-grid">
@@ -1744,9 +1702,6 @@ def generate_dashboard(data_points, stats, live_data=None):
     <script>
         // ── Property Valuation Calculator ──
         const CURRENT_GILT = {current_yield};
-        const valueHero = document.getElementById('valueHero');
-        const vhValue = document.getElementById('vhValue');
-        const vhSub = document.getElementById('vhSub');
         const rentInput = document.getElementById('calcRent');
         const yieldInput = document.getElementById('calcYield');
         const priceInput = document.getElementById('calcPrice');
@@ -2013,7 +1968,6 @@ def generate_dashboard(data_points, stats, live_data=None):
             if (!rent || !propYield || rent <= 0 || propYield <= 0) {{
                 placeholder.style.display = 'flex';
                 content.classList.remove('visible');
-                valueHero.style.display = 'none';
                 updateValueChart(0, 0, 0);
                 return;
             }}
@@ -2023,22 +1977,6 @@ def generate_dashboard(data_points, stats, live_data=None):
 
             const baseValue = rent / (propYield / 100);
             baseValEl.textContent = formatGBP(baseValue);
-
-            // Show value hero
-            vhValue.textContent = formatGBP(baseValue);
-            vhSub.textContent = formatGBPFull(Math.round(rent)) + ' rent at ' + propYield.toFixed(2) + '% yield';
-            valueHero.style.display = '';
-
-            // Save to localStorage
-            try {{
-                localStorage.setItem('giltCalc', JSON.stringify({{
-                    mode: inputMode,
-                    rent: rentInput.value,
-                    yield: yieldInput.value,
-                    price: priceInput.value,
-                    passThrough: passThroughInput.value
-                }}));
-            }} catch(e) {{}}
 
             // Scenarios: gilt moves from -75bps to +75bps in 25bp steps
             // Property yield shift = gilt move * pass-through rate
@@ -2121,21 +2059,6 @@ def generate_dashboard(data_points, stats, live_data=None):
             recalculate();
         }});
 
-        // Restore saved inputs from localStorage
-        try {{
-            const saved = JSON.parse(localStorage.getItem('giltCalc'));
-            if (saved) {{
-                rentInput.value = saved.rent || '';
-                yieldInput.value = saved.yield || '';
-                priceInput.value = saved.price || '';
-                passThroughInput.value = saved.passThrough || '50';
-                if (saved.mode === 'price') {{
-                    modePriceBtn.click();
-                }} else {{
-                    recalculate();
-                }}
-            }}
-        }} catch(e) {{}}
     </script>
 </body>
 </html>"""
