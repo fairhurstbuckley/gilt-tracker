@@ -1130,18 +1130,150 @@ def generate_dashboard(data_points, stats, live_data=None):
         }}
 
         @media (max-width: 768px) {{
-            .header, .yield-hero, .container {{
-                padding-left: 20px;
-                padding-right: 20px;
+            .header {{
+                padding: 16px 16px;
+                gap: 12px;
             }}
+
+            .header-left {{
+                gap: 12px;
+            }}
+
+            .header-title h1 {{
+                font-size: 17px;
+            }}
+
+            .header-title p {{
+                font-size: 11px;
+            }}
+
+            .header-right {{
+                gap: 12px;
+            }}
+
+            .header-meta {{
+                font-size: 11px;
+            }}
+
+            .header-logo img {{
+                height: 32px;
+            }}
+
+            .yield-hero {{
+                padding: 20px 16px;
+                gap: 16px;
+            }}
+
             .yield-value {{
                 font-size: 40px;
             }}
-            .chart-wrapper, .value-chart-wrapper {{
-                height: 300px;
+
+            .yield-change {{
+                padding-bottom: 0;
             }}
-            .header-logo img {{
-                height: 36px;
+
+            .change-badge {{
+                font-size: 12px;
+                padding: 3px 10px;
+            }}
+
+            .summary-callout {{
+                padding: 12px 16px;
+                font-size: 13px;
+            }}
+
+            .container {{
+                padding: 20px 16px;
+            }}
+
+            .stats-grid {{
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }}
+
+            .stat-card {{
+                padding: 14px;
+            }}
+
+            .stat-value {{
+                font-size: 20px;
+            }}
+
+            .chart-container {{
+                padding: 16px;
+            }}
+
+            .chart-header {{
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+                margin-bottom: 14px;
+            }}
+
+            .chart-title {{
+                font-size: 14px;
+            }}
+
+            .chart-wrapper, .value-chart-wrapper {{
+                height: 260px;
+            }}
+
+            .timeframe-btns {{
+                gap: 4px;
+            }}
+
+            .tf-btn {{
+                padding: 5px 11px;
+                font-size: 11px;
+            }}
+
+            .trend-summary {{
+                padding: 12px 16px;
+                font-size: 13px;
+                margin: 0 0 20px 0;
+            }}
+
+            .calculator {{
+                padding: 18px;
+            }}
+
+            .calculator h3 {{
+                font-size: 15px;
+            }}
+
+            .calc-subtitle {{
+                font-size: 12px;
+            }}
+
+            .calc-results-content {{
+                padding: 16px;
+            }}
+
+            .calc-base-val {{
+                padding: 14px;
+            }}
+
+            .cbv-value {{
+                font-size: 24px;
+            }}
+
+            .calc-scenario-table {{
+                font-size: 12px;
+            }}
+
+            .calc-scenario-table th,
+            .calc-scenario-table td {{
+                padding: 6px 8px;
+            }}
+
+            .data-note {{
+                padding: 16px;
+                font-size: 12px;
+            }}
+
+            .footer {{
+                padding: 18px 16px;
+                font-size: 11px;
             }}
         }}
     </style>
