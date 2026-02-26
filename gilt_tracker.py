@@ -1100,18 +1100,18 @@ def generate_dashboard(data_points, stats, live_data=None):
             background: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 10px;
-            padding: 22px 28px;
+            padding: 16px 20px;
             margin-bottom: 28px;
-            font-size: 13px;
+            font-size: 11px;
             color: #6b7280;
-            line-height: 1.7;
+            line-height: 1.6;
         }}
 
         .data-note h4 {{
-            font-size: 13px;
+            font-size: 11px;
             font-weight: 700;
             color: #32373c;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }}
 
         .data-note p {{
@@ -1280,8 +1280,8 @@ def generate_dashboard(data_points, stats, live_data=None):
             }}
 
             .data-note {{
-                padding: 16px;
-                font-size: 12px;
+                padding: 12px 14px;
+                font-size: 10px;
             }}
 
             .footer {{
