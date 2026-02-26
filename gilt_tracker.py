@@ -19,7 +19,7 @@ from pathlib import Path
 SERIES_CODE = "IUDMNZC"
 BOE_API_URL = "https://www.bankofengland.co.uk/boeapps/database/_iadb-fromshowcolumns.asp"
 OUTPUT_DIR = Path(__file__).parent
-DASHBOARD_FILE = OUTPUT_DIR / "gilt_dashboard.html"
+DASHBOARD_FILE = OUTPUT_DIR / "index.html"
 DATA_FILE = OUTPUT_DIR / "gilt_data.json"
 LOGO_FILE = OUTPUT_DIR.parent / "Branding" / "Fairhurst-Buckley-logo-COLOUR.jpg"
 
