@@ -1338,7 +1338,7 @@ def generate_dashboard(data_points, stats, live_data=None):
 
     <div class="summary-callout">
         <span class="sc-icon">&#9432;</span>
-        <span>Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.2f}%</strong> ({month_bps:.0f}bps), {borrowing_verb} the implied cost of long-term property debt.</span>
+        <span>Over the past month, gilt yields have <strong>{yield_direction} by {abs(month_change):.3f}%</strong> ({month_bps:.0f}bps), {borrowing_verb} the implied cost of long-term property debt.</span>
     </div>
 
     <div class="container">
